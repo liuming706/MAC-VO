@@ -1,43 +1,35 @@
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
-# Env vars for the nvidia-container-runtime.
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
+ENV DEBIAN_FRONTEND=noninteractive
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute
 
-RUN apt-get update
-RUN apt-get install -y unzip sudo git wget python3-pip 
-RUN apt-get install -y ffmpeg libsm6 libxext6 libgtk-3-dev libxkbcommon-x11-0 vulkan-tools
+# 使用国内镜像加速 apt
+RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
+    apt-get update && apt-get install -y \
+    unzip sudo git wget python3-pip \
+    ffmpeg libsm6 libxext6 libgtk-3-dev libxkbcommon-x11-0 vulkan-tools && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update
-RUN apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-
+# 创建非 root 用户
 ARG USERNAME=macvo
-RUN useradd -ms /bin/bash ${USERNAME} 
-RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-# RUN wget \
-#     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-#     && bash Miniconda3-latest-Linux-x86_64.sh -b -p /home/${USERNAME}/.conda \
-#     && rm -f Miniconda3-latest-Linux-x86_64.sh 
-# RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.conda
-# RUN conda init && . ~/.bashrc
+RUN useradd -ms /bin/bash ${USERNAME} && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-USER root
-
+# 使用非 root 用户
 USER ${USERNAME}
-ENV PATH="/home/${USERNAME}/.conda/bin:${PATH}"
 WORKDIR /home/${USERNAME}
 
-# Setup environment
-SHELL ["/bin/bash", "-l", "-c"]
+# 设置 PATH 和 pip 源
+ENV PATH="/home/${USERNAME}/.local/bin:$PATH"
+RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir \
+        'pypose>=0.6.8' opencv-python-headless evo \
+        matplotlib tabulate tqdm rich cupy-cuda12x einops \
+        timm==0.9.12 rerun-sdk==0.21.0 yacs \
+        numpy pyyaml wandb pillow scipy flow_vis h5py \
+        xformers==0.0.27.post2 onnx torchvision
 
-RUN sudo pip3 install --upgrade pip
-RUN sudo pip3 install --no-cache-dir pypose>=0.6.8  
-RUN sudo pip3 install --no-cache-dir opencv-python-headless evo 
-RUN sudo pip3 install --no-cache-dir matplotlib tabulate tqdm rich cupy-cuda12x einops 
-RUN sudo pip3 install --no-cache-dir timm==0.9.12 rerun-sdk==0.21.0 yacs 
-RUN sudo pip3 install --no-cache-dir numpy 
-RUN sudo pip3 install --no-cache-dir pyyaml wandb pillow scipy flow_vis h5py 
-RUN sudo pip3 install --no-cache-dir xformers==0.0.27.post2 onnx
-RUN sudo pip3 install --no-cache-dir torchvision
+CMD ["/bin/bash"]
 
-CMD /bin/bash
