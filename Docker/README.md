@@ -21,7 +21,7 @@ Replace `user` with your desired username. Save the changes.
 To build the Docker image, run the following command from the directory containing the Dockerfile:
 
 ```bash
-docker build --no-cache -t your-image-name:latest .
+docker build --no-cache -t mac_vo:latest .
 ```
 
 Replace `your-image-name` with a name of your choice for the Docker image.
@@ -31,7 +31,7 @@ Replace `your-image-name` with a name of your choice for the Docker image.
 To build the Docker image, run the following command from the directory containing the Dockerfile:
 
 ```bash
-docker build --no-cache -t -f DockerfileRoot your-image-name:latest .
+docker build --no-cache -t -f DockerfileRoot mac_vo:latest .
 ```
 
 Replace `your-image-name` with a name of your choice for the Docker image.
@@ -54,5 +54,5 @@ docker run -td --net=host --ipc=host \
     -e ROS_IP=127.0.0.1 \
     --cap-add=SYS_PTRACE \
     -v /etc/group:/etc/group:ro \
-    yutianchen/your-image-name:latest bash
+    mac_vo:latest bash
 ```

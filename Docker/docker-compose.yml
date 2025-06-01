@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  macvo:
+    build: .                      # 从当前目录中的 Dockerfile 构建镜像
+    image: mac_vo:latest
+    container_name: mac_vo_container
+    runtime: nvidia
+    environment:
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /home/lumen/workspace/mav_vo_ws/dataset:/data
+      - /home/lumen/workspace/mav_vo_ws/MAC-VO:/home/macvo/workspace
+    network_mode: bridge
+    ipc: host
+    stdin_open: true
+    tty: true
+    restart: "no"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - capabilities:
+            - gpu
+            count: all
+            driver: nvidia
+    

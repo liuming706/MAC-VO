@@ -1,5 +1,5 @@
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
-
+#FROM nvidia/cuda:12.5.1-cudnn-devel-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=graphics,utility,compute

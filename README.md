@@ -83,7 +83,7 @@ To run the Docker:
 
 To run the Docker with visualization: 
 
-    $ xhost +local:docker; docker run --gpus all -it --rm  -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v [DATA_PATH]:/data -v [CODE_PATH]:/home/macvo/workspace macvo:latest
+    $ xhost +local:docker; docker run --gpus all -it --rm  -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v /home/lumen/workspace/mav_vo_ws/dataset:/data -v /home/lumen/workspace/mav_vo_ws/MAC-VO:/home/macvo/workspace mac_vo:latest
 
 
 ### 3/4 Run MAC-VO
@@ -94,7 +94,10 @@ We will use `Config/Experiment/MACVO/MACVO_example.yaml` as the configuration fi
 2. Run with the following command
 
     ```bash
+    $ docker-compose up
+    $ docker exec -it mac_vo_container bash
     $ cd workspace
+    $ export HF_ENDPOINT=https://hf-mirror.com
     $ python3 MACVO.py --odom Config/Experiment/MACVO/MACVO_example.yaml --data Config/Sequence/TartanAir_example.yaml
     ```
 
